@@ -11,11 +11,11 @@
 
 **Proposal target:** Mid-September 2026
 
-- [ ] **T-01 - Install and verify tools.** Install SWI-Prolog and Python 3, then record their versions. Confirm that `library(clpfd)` loads successfully. (NFR-03)
-- [ ] **T-02 - Create the project structure.** Add the `src`, `data`, `tests`, `scripts`, and `reports` directories described in the design. (NFR-04)
-- [ ] **T-03 - Document developer commands.** Add setup, test, solver, and benchmark command placeholders to `README.md`; fill them in as components are implemented. (NFR-02)
-- [ ] **T-04 - Confirm the shared board contract.** Use nine rows of nine integers with `0` as an empty cell and document the in-memory forms for Prolog and Python. (FR-01, FR-02)
-- [ ] **T-05 - Review core Prolog concepts.** Prepare concise project notes on predicates, recursion, unification, logic variables, goals, and backtracking for use in the final explanation. (FR-22)
+- [x] **T-01 - Install and verify tools.** Install SWI-Prolog and Python 3, then record their versions. Confirm that `library(clpfd)` loads successfully. (NFR-03)
+- [x] **T-02 - Create the project structure.** Add the `src`, `data`, `tests`, `scripts`, and `reports` directories described in the design. (NFR-04)
+- [x] **T-03 - Document developer commands.** Add setup, test, solver, and benchmark command placeholders to `README.md`; fill them in as components are implemented. (NFR-02)
+- [x] **T-04 - Confirm the shared board contract.** Use nine rows of nine integers with `0` as an empty cell and document the in-memory forms for Prolog and Python. (FR-01, FR-02)
+- [x] **T-05 - Review core Prolog concepts.** Prepare concise project notes on predicates, recursion, unification, logic variables, goals, and backtracking for use in the final explanation. (FR-22)
 
 **Exit criteria:** Both runtimes work, CLP(FD) loads, the repository structure exists, and the common board representation is fixed.
 

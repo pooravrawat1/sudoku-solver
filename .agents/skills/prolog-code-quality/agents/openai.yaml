@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prolog Code Quality"
+  short_description: "Write and review readable SWI-Prolog code"
+  default_prompt: "Use $prolog-code-quality to review and improve the Prolog code in this project."
