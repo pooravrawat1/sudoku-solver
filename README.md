@@ -35,7 +35,8 @@ them.
 
 ## Commands
 
-These commands will become active as their milestone is implemented:
+Use the available commands below; later milestones will fill in the remaining
+placeholders.
 
 ```sh
 # Prolog tests

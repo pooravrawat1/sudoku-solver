@@ -30,6 +30,22 @@ that it moves toward that base case.
 box predicates apply `all_distinct/1`. Constraint propagation removes values
 that can no longer satisfy those relationships before explicit search begins.
 
+The code maps Sudoku concepts to CLP(FD) as follows:
+
+| Sudoku concept | Prolog representation |
+| --- | --- |
+| Empty cell | A fresh logic variable created from an input `0` |
+| Fixed clue | The original integer, preserved through unification |
+| Allowed values | `Cells ins 1..9` |
+| Row uniqueness | `all_distinct/1` on each input row |
+| Column uniqueness | `transpose/2`, then `all_distinct/1` on each column |
+| Box uniqueness | Three-row groups converted into boxes for `all_distinct/1` |
+| Deduction | CLP(FD) propagation narrows variable domains |
+
+All domains and uniqueness constraints are posted before search. This lets
+propagation share information across rows, columns, and boxes before Prolog
+selects any concrete candidate values.
+
 ## Search and backtracking
 
 After all constraints are posted, `labeling/2` selects concrete values for the

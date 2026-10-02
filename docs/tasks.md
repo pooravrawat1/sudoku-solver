@@ -23,14 +23,14 @@
 
 **Proposal target:** Early October 2026
 
-- [ ] **T-06 - Add canonical fixtures.** Add easy, hard, solved, and valid-but-unsolvable puzzle files with their source or selection rationale. (FR-08)
-- [ ] **T-07 - Add invalid test boards.** Create cases for bad dimensions, out-of-range values, and duplicate clues in a row, column, and box. (FR-03)
-- [ ] **T-08 - Implement Prolog board validation.** Check dimensions, integer values, range, and conflicts among nonzero clues. (FR-01 through FR-03)
-- [ ] **T-09 - Normalize Prolog cells.** Convert `0` cells to fresh logic variables while preserving fixed clues. (FR-04, FR-10)
-- [ ] **T-10 - Implement row constraints.** Constrain all cells to `1..9` and apply `all_distinct/1` to every row. (FR-10, FR-11)
-- [ ] **T-11 - Implement column constraints.** Use `transpose/2` and apply `all_distinct/1` to every column. (FR-11)
-- [ ] **T-12 - Implement box constraints.** Group the board into nine 3 x 3 boxes and apply `all_distinct/1` to each. (FR-11)
-- [ ] **T-13 - Document CLP(FD) mapping.** Explain how domains, `all_distinct/1`, propagation, and unification correspond to Sudoku rules. (FR-22)
+- [x] **T-06 - Add canonical fixtures.** Add easy, hard, solved, and valid-but-unsolvable puzzle files with their source or selection rationale. (FR-08)
+- [x] **T-07 - Add invalid test boards.** Create cases for bad dimensions, out-of-range values, and duplicate clues in a row, column, and box. (FR-03)
+- [x] **T-08 - Implement Prolog board validation.** Check dimensions, integer values, range, and conflicts among nonzero clues. (FR-01 through FR-03)
+- [x] **T-09 - Normalize Prolog cells.** Convert `0` cells to fresh logic variables while preserving fixed clues. (FR-04, FR-10)
+- [x] **T-10 - Implement row constraints.** Constrain all cells to `1..9` and apply `all_distinct/1` to every row. (FR-10, FR-11)
+- [x] **T-11 - Implement column constraints.** Use `transpose/2` and apply `all_distinct/1` to every column. (FR-11)
+- [x] **T-12 - Implement box constraints.** Group the board into nine 3 x 3 boxes and apply `all_distinct/1` to each. (FR-11)
+- [x] **T-13 - Document CLP(FD) mapping.** Explain how domains, `all_distinct/1`, propagation, and unification correspond to Sudoku rules. (FR-22)
 
 **Exit criteria:** All Sudoku constraints can be posted for a valid 9 x 9 board, and invalid boards are rejected before labeling.
 
