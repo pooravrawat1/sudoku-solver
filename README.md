@@ -1,7 +1,6 @@
 # Sudoku Solver
 
-A small course project comparing a declarative SWI-Prolog Sudoku solver with an
-explicit Python backtracking solver.
+Comparing a declarative SWI-Prolog Sudoku solver with an explicit Python backtracking solver.
 
 ## Requirements
 
