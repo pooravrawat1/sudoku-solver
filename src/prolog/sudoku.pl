@@ -1,8 +1,28 @@
 :- module(sudoku,
-    [ valid_puzzle/1
+    [ solve/2,
+      valid_puzzle/1,
+      valid_solution/2
     ]).
 
 :- use_module(library(clpfd)).
+
+
+%!  solve(+Puzzle, -Solution) is nondet.
+%
+%   Solves a 9 x 9 integer Puzzle, using 0 for an empty cell. Each result is
+%   a completed board that preserves the clues. Fails for invalid input or
+%   a valid puzzle without a solution; use valid_puzzle/1 to distinguish them.
+
+solve(Puzzle, Solution) :-
+    constrain_puzzle(Puzzle, Solution),
+    append(Solution, Cells),
+    labeling_options(Options),
+    labeling(Options, Cells),
+    valid_solution(Puzzle, Solution).
+
+
+% First-fail combined with constraint degree chooses the most restricted cell.
+labeling_options([ffc]).
 
 
 %!  valid_puzzle(+Puzzle) is semidet.
@@ -15,6 +35,47 @@ valid_puzzle(Puzzle) :-
     length(Puzzle, 9),
     maplist(valid_row, Puzzle),
     clues_are_consistent(Puzzle).
+
+
+%!  valid_solution(+Puzzle, +Solution) is semidet.
+%
+%   True when Solution is a complete 9 x 9 board with every digit in each
+%   row, column, and box, and every nonzero clue from Puzzle is unchanged.
+%   Checks concrete integers and units without using CLP(FD) search.
+
+valid_solution(Puzzle, Solution) :-
+    valid_puzzle(Puzzle),
+    is_list(Solution),
+    length(Solution, 9),
+    maplist(completed_row, Solution),
+    puzzle_units(Solution, Units),
+    maplist(complete_unit, Units),
+    maplist(clues_preserved, Puzzle, Solution).
+
+
+completed_row(Row) :-
+    is_list(Row),
+    length(Row, 9),
+    maplist(completed_cell, Row).
+
+
+completed_cell(Cell) :-
+    integer(Cell),
+    between(1, 9, Cell).
+
+
+complete_unit(Unit) :-
+    sort(Unit, [1, 2, 3, 4, 5, 6, 7, 8, 9]).
+
+
+clues_preserved(PuzzleRow, SolutionRow) :-
+    maplist(clue_preserved, PuzzleRow, SolutionRow).
+
+
+clue_preserved(0, _).
+clue_preserved(Clue, Value) :-
+    Clue =\= 0,
+    Clue =:= Value.
 
 
 valid_row(Row) :-
@@ -48,8 +109,7 @@ no_duplicate_clues(Unit) :-
 %!  constrain_puzzle(+Puzzle, -Board) is semidet.
 %
 %   Validates Puzzle, replaces its zeros with fresh logic variables, and
-%   posts every Sudoku constraint on Board. It intentionally does not label
-%   the variables; search is added by the public solver in Milestone 3.
+%   posts every Sudoku constraint on Board without labeling the variables.
 
 constrain_puzzle(Puzzle, Board) :-
     valid_puzzle(Puzzle),

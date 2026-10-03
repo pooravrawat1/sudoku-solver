@@ -1,6 +1,7 @@
 :- begin_tests(sudoku_constraints).
 
 :- use_module('../../src/prolog/sudoku').
+:- use_module('../../src/prolog/puzzle_io').
 :- use_module(library(clpfd)).
 
 
@@ -101,6 +102,111 @@ test(box_constraint_is_posted, [fail]) :-
     Second #= 1.
 
 
+test(solves_easy_fixture) :-
+    easy_puzzle(Puzzle),
+    once(solve(Puzzle, Solution)),
+    solved_puzzle(Expected),
+    assertion(Solution == Expected),
+    assertion(valid_solution(Puzzle, Solution)).
+
+
+test(solves_hard_fixture) :-
+    fixture(hard, Puzzle),
+    once(solve(Puzzle, Solution)),
+    assertion(valid_solution(Puzzle, Solution)).
+
+
+test(accepts_completed_fixture) :-
+    solved_puzzle(Puzzle),
+    once(solve(Puzzle, Solution)),
+    assertion(Solution == Puzzle),
+    assertion(valid_solution(Puzzle, Solution)).
+
+
+test(valid_but_unsolvable_fails, [fail]) :-
+    unsolvable_puzzle(Puzzle),
+    solve(Puzzle, _).
+
+
+test(rejects_all_invalid_fixtures) :-
+    forall(
+        member(Name, [
+            'invalid/wrong_rows',
+            'invalid/wrong_columns',
+            'invalid/non_integer',
+            'invalid/out_of_range',
+            'invalid/duplicate_row',
+            'invalid/duplicate_column',
+            'invalid/duplicate_box'
+        ]),
+        (   fixture(Name, Puzzle),
+            assertion(\+ valid_puzzle(Puzzle)),
+            assertion(\+ solve(Puzzle, _))
+        )
+    ).
+
+
+test(solution_rejects_incomplete_board, [fail]) :-
+    easy_puzzle(Puzzle),
+    valid_solution(Puzzle, Puzzle).
+
+
+test(solution_rejects_duplicate_row, [fail]) :-
+    zero_rows(9, Puzzle),
+    solved_puzzle([[_, Second|Rest]|OtherRows]),
+    Invalid = [[Second, Second|Rest]|OtherRows],
+    valid_solution(Puzzle, Invalid).
+
+
+test(solution_rejects_duplicate_column, [fail]) :-
+    zero_rows(9, Puzzle),
+    solved_puzzle([[First, Second|Rest]|OtherRows]),
+    Invalid = [[Second, First|Rest]|OtherRows],
+    valid_solution(Puzzle, Invalid).
+
+
+test(solution_rejects_invalid_box, [fail]) :-
+    zero_rows(9, Puzzle),
+    solved_puzzle([First, Second, Third, Fourth|OtherRows]),
+    Invalid = [First, Fourth, Third, Second|OtherRows],
+    valid_solution(Puzzle, Invalid).
+
+
+test(solution_rejects_changed_clue, [fail]) :-
+    solved_puzzle(Puzzle),
+    maplist(swap_row_digits, Puzzle, OtherSolution),
+    valid_solution(Puzzle, OtherSolution).
+
+
+test(solution_rejects_wrong_shape, [fail]) :-
+    solved_puzzle(Puzzle),
+    Puzzle = [_|ShortSolution],
+    valid_solution(Puzzle, ShortSolution).
+
+
+test(solution_rejects_noninteger, [fail]) :-
+    zero_rows(9, Puzzle),
+    solved_puzzle([[_, Second|Rest]|OtherRows]),
+    Invalid = [[x, Second|Rest]|OtherRows],
+    valid_solution(Puzzle, Invalid).
+
+
+swap_row_digits(Row, Swapped) :-
+    maplist(swap_digit, Row, Swapped).
+
+
+swap_digit(3, 5).
+swap_digit(5, 3).
+swap_digit(Digit, Digit) :-
+    Digit =\= 3,
+    Digit =\= 5.
+
+
+fixture(Name, Puzzle) :-
+    format(atom(File), 'data/puzzles/~w.txt', [Name]),
+    load_puzzle(File, Puzzle).
+
+
 zero_rows(Count, Rows) :-
     length(Rows, Count),
     maplist(zero_row, Rows).
@@ -109,30 +215,16 @@ zero_rows(Count, Rows) :-
 zero_row([0, 0, 0, 0, 0, 0, 0, 0, 0]).
 
 
-easy_puzzle([
-    [5, 3, 0, 0, 7, 0, 0, 0, 0],
-    [6, 0, 0, 1, 9, 5, 0, 0, 0],
-    [0, 9, 8, 0, 0, 0, 0, 6, 0],
-    [8, 0, 0, 0, 6, 0, 0, 0, 3],
-    [4, 0, 0, 8, 0, 3, 0, 0, 1],
-    [7, 0, 0, 0, 2, 0, 0, 0, 6],
-    [0, 6, 0, 0, 0, 0, 2, 8, 0],
-    [0, 0, 0, 4, 1, 9, 0, 0, 5],
-    [0, 0, 0, 0, 8, 0, 0, 7, 9]
-]).
+easy_puzzle(Puzzle) :-
+    fixture(easy, Puzzle).
 
 
-unsolvable_puzzle([
-    [5, 3, 1, 0, 7, 0, 0, 0, 0],
-    [6, 0, 0, 1, 9, 5, 0, 0, 0],
-    [0, 9, 8, 0, 0, 0, 0, 6, 0],
-    [8, 0, 0, 0, 6, 0, 0, 0, 3],
-    [4, 0, 0, 8, 0, 3, 0, 0, 1],
-    [7, 0, 0, 0, 2, 0, 0, 0, 6],
-    [0, 6, 0, 0, 0, 0, 2, 8, 0],
-    [0, 0, 0, 4, 1, 9, 0, 0, 5],
-    [0, 0, 0, 0, 8, 0, 0, 7, 9]
-]).
+solved_puzzle(Puzzle) :-
+    fixture(solved, Puzzle).
+
+
+unsolvable_puzzle(Puzzle) :-
+    fixture(unsolvable, Puzzle).
 
 
 :- end_tests(sudoku_constraints).

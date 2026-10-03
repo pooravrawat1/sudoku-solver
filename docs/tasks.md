@@ -38,11 +38,11 @@
 
 **Proposal target:** Late October 2026
 
-- [ ] **T-14 - Implement the public Prolog solver.** Add `solve/2`, post all constraints, and label the remaining variables with a documented option. (FR-09 through FR-13)
-- [ ] **T-15 - Implement Prolog solution validation.** Check all units and clue preservation independently from search. (FR-04, FR-05, NFR-01)
-- [ ] **T-16 - Add Prolog unit tests.** Cover easy, hard, solved, unsolvable, malformed, conflicting, and clue-preservation cases with `plunit`. (FR-03 through FR-08, NFR-08)
-- [ ] **T-17 - Add a Prolog demonstration command.** Make it easy to run a named fixture and print a solved board or clear status. (FR-17)
-- [ ] **T-18 - Verify Prolog acceptance criteria.** Run the full Prolog suite and save the command and result for the project record. (NFR-01, NFR-02)
+- [x] **T-14 - Implement the public Prolog solver.** Add `solve/2`, post all constraints, and label the remaining variables with a documented option. (FR-09 through FR-13)
+- [x] **T-15 - Implement Prolog solution validation.** Check all units and clue preservation independently from search. (FR-04, FR-05, NFR-01)
+- [x] **T-16 - Add Prolog unit tests.** Cover easy, hard, solved, unsolvable, malformed, conflicting, and clue-preservation cases with `plunit`. (FR-03 through FR-08, NFR-08)
+- [x] **T-17 - Add a Prolog demonstration command.** Make it easy to run a named fixture and print a solved board or clear status. (FR-17)
+- [x] **T-18 - Verify Prolog acceptance criteria.** Run the full Prolog suite and save the command and result for the project record. (NFR-01, NFR-02)
 
 **Exit criteria:** The Prolog solver passes its automated tests and solves the selected easy and hard boards from a documented command.
 

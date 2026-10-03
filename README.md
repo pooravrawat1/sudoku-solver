@@ -35,24 +35,37 @@ them.
 
 ## Commands
 
-Use the available commands below; later milestones will fill in the remaining
-placeholders.
+Run these commands from the repository root.
 
 ```sh
 # Prolog tests
 swipl -q -g run_tests -t halt tests/prolog/test_sudoku.pl
 
-# Python tests
-python3 -m unittest discover -s tests/python -v
-
 # Prolog quality checks
 .agents/skills/prolog-code-quality/scripts/check_prolog.sh
 
-# Benchmark
-python3 scripts/benchmark.py
+# Prolog fixture demonstrations
+swipl -q -s scripts/demo_prolog.pl -- easy
+swipl -q -s scripts/demo_prolog.pl -- hard
+swipl -q -s scripts/demo_prolog.pl -- unsolvable
+swipl -q -s scripts/demo_prolog.pl -- invalid/duplicate_box
 ```
 
-The final solver demonstration commands will be added with tasks T-17 and T-25.
+The demonstration prints `solved` followed by nine rows, `unsolvable`, or
+`invalid`. It accepts the named files under `data/puzzles/`, including the
+seven `invalid/...` fixtures. From the SWI-Prolog console, import the module
+with `use_module('src/prolog/sudoku').` and call
+`solve(Puzzle, Solution).` The public `valid_puzzle/1` predicate checks input;
+`valid_solution/2` checks a completed board and clue preservation. `solve/2`
+fails for both invalid and valid but unsolvable puzzles, so check
+`valid_puzzle/1` first when the distinction matters. Search uses
+`labeling([ffc], Cells)` after posting all Sudoku constraints. The `ffc`
+option chooses a cell with a small remaining domain and high constraint
+degree first.
+
+Python tests, its demonstration, and the benchmark will be added in Milestone 4.
+The Milestone 3 acceptance run is recorded in
+[reports/milestone-3.md](reports/milestone-3.md).
 
 See [requirements](docs/requirements.md), [design](docs/design.md), and
 [implementation tasks](docs/tasks.md) for project details.
