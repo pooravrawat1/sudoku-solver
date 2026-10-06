@@ -1,0 +1,5 @@
+puzzle,implementation,runs,median_ms,minimum_ms,maximum_ms
+easy,prolog,7,7.648945,7.426023,7.693052
+easy,python,7,1.510333,1.488709,1.627334
+hard,prolog,7,14.863014,14.391184,15.414000
+hard,python,7,39.344667,39.241500,39.484958

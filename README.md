@@ -43,11 +43,26 @@ swipl -q -g run_tests -t halt tests/prolog/test_sudoku.pl
 # Prolog quality checks
 .agents/skills/prolog-code-quality/scripts/check_prolog.sh
 
+# Python tests
+python3 -m unittest discover -s tests/python -v
+
 # Prolog fixture demonstrations
 swipl -q -s scripts/demo_prolog.pl -- easy
 swipl -q -s scripts/demo_prolog.pl -- hard
 swipl -q -s scripts/demo_prolog.pl -- unsolvable
 swipl -q -s scripts/demo_prolog.pl -- invalid/duplicate_box
+
+# Python fixture demonstrations
+python3 scripts/demo_python.py easy
+python3 scripts/demo_python.py hard
+python3 scripts/demo_python.py unsolvable
+python3 scripts/demo_python.py invalid/duplicate_box
+
+# Repeat the recorded comparison (one warm-up and seven measured runs per case)
+python3 scripts/benchmark.py
+
+# Count nonblank, non-comment-only lines in the two solver modules
+python3 scripts/count_lines.py
 ```
 
 The demonstration prints `solved` followed by nine rows, `unsolvable`, or
@@ -62,9 +77,18 @@ fails for both invalid and valid but unsolvable puzzles, so check
 option chooses a cell with a small remaining domain and high constraint
 degree first.
 
-Python tests, its demonstration, and the benchmark will be added in Milestone 4.
-The Milestone 3 acceptance run is recorded in
-[reports/milestone-3.md](reports/milestone-3.md).
+Python exposes `validate_puzzle(board)`, `solve(board)`, and
+`is_solution(original, candidate)` in `src/python/sudoku.py`. Invalid input
+raises `ValueError`; valid puzzles with no solution return `None`. The solver
+copies its input, uses minimum remaining values to select an empty cell, and
+tries digits in ascending order. Both demos print the same three statuses.
+
+The benchmark uses the shared easy and hard fixtures. It excludes fixture
+loading and process startup from timing, checks every result independently,
+and writes raw timings, medians, environment details, and source-line counts
+to `reports/benchmark/`. See [the Milestone 4 record](reports/milestone-4.md)
+for the method and current results. The [Milestone 3 record](reports/milestone-3.md)
+contains the earlier Prolog acceptance run.
 
 See [requirements](docs/requirements.md), [design](docs/design.md), and
 [implementation tasks](docs/tasks.md) for project details.

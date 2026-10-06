@@ -1,0 +1,3 @@
+implementation,file,source_lines
+prolog,src/prolog/sudoku.pl,93
+python,src/python/sudoku.py,97

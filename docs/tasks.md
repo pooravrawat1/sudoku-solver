@@ -50,16 +50,16 @@
 
 **Proposal target:** Early November 2026
 
-- [ ] **T-19 - Implement Python input validation.** Enforce the shared shape, type, range, and initial-conflict rules. (FR-01 through FR-03)
-- [ ] **T-20 - Implement candidate checking.** Add clear row, column, and box checks for a proposed value. (FR-05, FR-14)
-- [ ] **T-21 - Implement recursive backtracking.** Select an empty cell, try candidates, recurse, and roll back failed assignments. (FR-14 through FR-16)
-- [ ] **T-22 - Protect caller input.** Solve a board copy and return a solved board or `None` without leaving partial mutations in the input. (NFR-04)
-- [ ] **T-23 - Implement Python solution validation.** Check units and original clues independently from the backtracking search. (FR-04, FR-05, NFR-01)
-- [ ] **T-24 - Add Python unit tests.** Match the Prolog suite's behavioral cases with `unittest`. (FR-03 through FR-08, NFR-08)
-- [ ] **T-25 - Add a Python demonstration command.** Run the same easy and hard fixtures and print the result consistently. (FR-17)
-- [ ] **T-26 - Implement the benchmark harness.** Record environment details, warm-ups, repeated timings, validation outcomes, and medians for both solvers. (FR-18, NFR-06)
-- [ ] **T-27 - Implement the line-count procedure.** Count nonblank, non-comment source lines in the declared solver files and record the command. (FR-19)
-- [ ] **T-28 - Collect comparison data.** Run both implementations on the same machine and same fixtures, then save raw and summarized results. (FR-18, FR-19)
+- [x] **T-19 - Implement Python input validation.** Enforce the shared shape, type, range, and initial-conflict rules. (FR-01 through FR-03)
+- [x] **T-20 - Implement candidate checking.** Add clear row, column, and box checks for a proposed value. (FR-05, FR-14)
+- [x] **T-21 - Implement recursive backtracking.** Select an empty cell, try candidates, recurse, and roll back failed assignments. (FR-14 through FR-16)
+- [x] **T-22 - Protect caller input.** Solve a board copy and return a solved board or `None` without leaving partial mutations in the input. (NFR-04)
+- [x] **T-23 - Implement Python solution validation.** Check units and original clues independently from the backtracking search. (FR-04, FR-05, NFR-01)
+- [x] **T-24 - Add Python unit tests.** Match the Prolog suite's behavioral cases with `unittest`. (FR-03 through FR-08, NFR-08)
+- [x] **T-25 - Add a Python demonstration command.** Run the same easy and hard fixtures and print the result consistently. (FR-17)
+- [x] **T-26 - Implement the benchmark harness.** Record environment details, warm-ups, repeated timings, validation outcomes, and medians for both solvers. (FR-18, NFR-06)
+- [x] **T-27 - Implement the line-count procedure.** Count nonblank, non-comment source lines in the declared solver files and record the command. (FR-19)
+- [x] **T-28 - Collect comparison data.** Run both implementations on the same machine and same fixtures, then save raw and summarized results. (FR-18, FR-19)
 
 **Exit criteria:** Both implementations pass equivalent tests, solve the same demonstration puzzles, and have reproducible runtime and source-line records.
 

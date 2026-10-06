@@ -1,0 +1,24 @@
+{
+  "recorded_at_utc": "2026-10-06T15:51:48.238481+00:00",
+  "system": "Darwin",
+  "system_release": "25.6.0",
+  "machine": "arm64",
+  "processor": "arm",
+  "logical_cpu_count": 15,
+  "python_version": "3.14.7",
+  "prolog_version": "SWI-Prolog version 10.0.2 for arm64-darwin",
+  "puzzles": [
+    "easy",
+    "hard"
+  ],
+  "warmups_per_case": 1,
+  "measured_runs_per_case": 7,
+  "python_timing": "time.perf_counter_ns around solve(board) in one Python process",
+  "prolog_timing": "get_time around once(solve(Puzzle, Solution)) in one persistent Prolog process",
+  "fixture_loading_timed": false,
+  "process_startup_timed": false,
+  "summary_statistic": "median of measured runs in milliseconds",
+  "validation": "Every warm-up and measured result checked with Python is_solution",
+  "line_count_command": "python3 scripts/count_lines.py",
+  "line_count_rule": "exclude blank and comment-only lines; count solver modules only"
+}
