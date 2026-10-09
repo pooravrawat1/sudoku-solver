@@ -15,3 +15,8 @@ empty cell.
 The `invalid` directory contains deliberately malformed inputs for validation
 tests. The out-of-range case uses whitespace so that `10` remains one cell, and
 the non-integer case uses `x` as an invalid token.
+
+`search.txt` is an additional visual-demo fixture, made by retaining 23 cells
+from `solved.txt` (Python `random.Random(3).sample(range(81), 23)`). It exercises
+labeling and rollback in SWI-Prolog 10.0.2. It may have multiple solutions and
+is not part of the benchmark or a claim about puzzle difficulty.

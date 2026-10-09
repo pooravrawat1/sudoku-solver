@@ -252,3 +252,21 @@ The final analysis should address:
 ## 10. Completion Criteria
 
 The design is complete when both solvers implement the shared behavioral contract, all required tests pass, benchmark data can be reproduced, and the report connects observed code differences to the four course concepts named in the proposal.
+
+## 11. Local Visual Demonstration
+
+`scripts/serve_ui.py` serves static HTML/CSS/JavaScript from `src/web/` and
+accepts integer boards at `POST /api/trace`. Each request runs
+`scripts/trace_prolog.pl` in an isolated SWI-Prolog process. The trace adapter
+uses the existing model helpers and native labeling, with snapshots after
+domain setup and each unit constraint. Frozen goals observe search bindings
+and failing alternatives observe rollback. This instrumentation stays outside
+the benchmark solver and is regression-tested through the Python suite.
+
+The browser records the submitted board, then replays snapshots and binding
+deltas with pause, step, rewind, speed, and timeline controls. A search binding
+may be a decision or a propagated consequence; the UI intentionally labels both
+as bindings. No internal decision classification is claimed. The backtracking
+fixture demonstrates rollback; existing fixtures may finish during propagation.
+Invalid and unsolvable outcomes are separate terminal events. Resource limits
+return explicit errors instead of presenting an incomplete trace as a solution.

@@ -29,7 +29,9 @@ The project must:
 - Both implementations consume the same logical board representation and test fixtures.
 - The Prolog implementation targets SWI-Prolog and uses `library(clpfd)`.
 - The Python implementation targets a current Python 3 interpreter and should not require third-party packages.
-- A graphical user interface, puzzle generation, and support for nonstandard Sudoku variants are outside the project scope.
+- A local graphical demonstration interface is an optional extension to the
+  original solver comparison. Puzzle generation and nonstandard variants remain
+  outside scope.
 - The solvers may return the first solution they find. Counting or enumerating every solution is not required.
 
 ## 5. Functional Requirements
@@ -128,7 +130,8 @@ Accepted when it contains:
 ## 9. Out of Scope
 
 - Sudoku puzzle generation or difficulty grading.
-- A web, desktop, or mobile user interface.
+- A hosted web service or packaged desktop/mobile application. The local browser
+  interface is included as a demonstration extension.
 - Optical recognition of boards from images.
 - Network services, user accounts, or persistent storage.
 - Nonstandard board sizes or Sudoku variants.

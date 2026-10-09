@@ -1,5 +1,12 @@
 # Sudoku Solver Implementation Tasks
 
+## Local interface extension
+
+- [x] Add a playable browser board and a side-by-side Prolog execution journal.
+- [x] Record domain propagation, native labeling bindings, and backtracking undo.
+- [x] Add playback controls, custom clues, input checks, and a search fixture.
+- [x] Test trace outcomes and verify binding/undo replay reaches the solution.
+
 ## 1. Task Conventions
 
 - Tasks are ordered by dependency and grouped by the proposal's milestones.

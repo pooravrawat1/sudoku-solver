@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <title>Sudoku / Prolog</title>
+  <link rel="preload" href="/fonts/IBMPlexMono-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header>
+    <a class="brand" href="/" aria-label="Sudoku home">SUDOKU <span>/</span> PROLOG</a>
+    <span class="engine">SWI-Prolog <span>CLP(FD)</span></span>
+  </header>
+  <main>
+    <div class="intro">
+      <div>
+        <h1>Sudoku, step by step.</h1>
+        <p class="subtitle">Play the puzzle. Inspect the constraints. Follow the search.</p>
+      </div>
+      <p class="model-note">9 × 9 cells<br>27 all_distinct constraints</p>
+    </div>
+    <div class="workspace">
+      <section class="puzzle-panel" aria-label="Sudoku game">
+        <div class="panel-heading">
+          <h2 id="puzzle-title">Easy puzzle</h2>
+          <select id="puzzle" aria-label="Choose a puzzle">
+            <option value="easy">Easy puzzle</option>
+            <option value="hard">Hard puzzle</option>
+            <option value="search">Backtracking demo</option>
+            <option value="unsolvable">No-solution example</option>
+            <option value="solved">Completed example</option>
+            <option value="custom">Custom board</option>
+          </select>
+        </div>
+        <div class="board-wrap">
+          <div class="coordinates" aria-hidden="true"><span>C1</span><span>C2</span><span>C3</span><span>C4</span><span>C5</span><span>C6</span><span>C7</span><span>C8</span><span>C9</span></div>
+          <div class="row-coordinates" aria-hidden="true"><span>R1</span><span>R2</span><span>R3</span><span>R4</span><span>R5</span><span>R6</span><span>R7</span><span>R8</span><span>R9</span></div>
+          <div id="board" role="group" aria-label="Sudoku board"></div>
+        </div>
+        <div class="board-caption">
+          <span class="board-legend"><span><i class="legend clue"></i>Given</span><span><i class="legend deduction"></i>Binding</span><span><i class="legend undo"></i>Undo</span></span>
+          <span id="filled">0 / 81 filled</span>
+        </div>
+        <div id="number-pad" aria-label="Enter a digit"></div>
+        <div class="game-actions">
+          <label><input id="edit-clues" type="checkbox"> Edit clues</label>
+          <button id="check" class="text-button">Check board</button>
+          <button id="reset" class="text-button">Reset puzzle</button>
+        </div>
+        <p id="game-message" class="game-message" role="status">Select a cell and type 1–9. Backspace erases a move.</p>
+      </section>
+      <section class="trace-panel" aria-label="Prolog execution trace">
+        <div class="panel-heading"><h2>Execution log</h2><span id="phase" class="badge">Ready</span></div>
+        <div class="query"><span>?-</span> trace_puzzle(Puzzle).</div>
+        <div class="trace-summary"><span id="event-count">00 EVENTS</span><span id="backtrack-count">0 BACKTRACKS</span><span>RECORDED RUN</span></div>
+        <div id="journal" tabindex="0" aria-label="Execution events">
+          <div class="empty-journal">
+            <h3>No execution recorded.</h3>
+            <p>Start the solver to inspect each constraint and the variable bindings that follow.</p>
+            <p>Choose <b>Backtracking demo</b> to see Prolog undo bindings during search.</p>
+          </div>
+        </div>
+        <div class="inspector"><span class="eyebrow" id="cell-label">CELL INSPECTOR</span><p id="cell-detail">Select a square to inspect its value and domain.</p></div>
+      </section>
+    </div>
+    <section class="transport" aria-label="Solver playback controls">
+      <div class="transport-buttons">
+        <button id="solve" class="primary"><span>Watch Prolog</span></button>
+        <button id="step" disabled>Step</button>
+        <button id="rewind" disabled aria-label="Rewind trace">Rewind</button>
+      </div>
+      <div class="timeline">
+        <div><span id="playback-label">Ready to record</span><span id="progress-label">0 / 0</span></div>
+        <input id="progress" type="range" min="0" max="0" value="0" disabled aria-label="Trace position">
+      </div>
+      <label class="speed-label">Speed<select id="speed"><option value="1000">Slow</option><option value="350" selected>Normal</option><option value="70">Fast</option></select></label>
+    </section>
+    <div class="footnotes">
+      <p>Domains appear during propagation. Search logs show bindings and undo.</p>
+      <p>A binding can be a choice or a forced value. Playback does not distinguish them.</p>
+    </div>
+  </main>
+  <footer><span>Local Sudoku explorer</span><span>Actual Prolog execution. Adjustable playback.</span></footer>
+</body>
+</html>
