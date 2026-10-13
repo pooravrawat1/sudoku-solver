@@ -2,6 +2,18 @@
 
 Comparing a declarative SWI-Prolog Sudoku solver with an explicit Python backtracking solver.
 
+## Open the app locally
+
+From the repository root, run:
+
+```sh
+python3 scripts/serve_ui.py
+```
+
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser. Press
+Ctrl+C in the terminal to stop the server. SWI-Prolog is required for the
+solver playback.
+
 ## Requirements
 
 Verified with:
@@ -38,18 +50,15 @@ Run these commands from the repository root.
 
 ### Interactive Sudoku lab
 
-```sh
-python3 scripts/serve_ui.py
-```
-
-Open **http://127.0.0.1:8000** for a playable Sudoku board beside Prolog's
-execution journal. No additional packages or frontend build are needed.
-Use `--port 8001` if port 8000 is already occupied. Stop the server with Ctrl+C.
+The local page has a playable Sudoku board beside Prolog's execution log.
+Use `--port 8001` if port 8000 is already occupied, then open
+`http://127.0.0.1:8001`.
 
 - Select a square and type 1–9, or use the number pad; Backspace erases.
 - Choose a fixture or select **Custom board** to enter clues. **Check board**
   flags direct conflicts; it does not prove a partial board is solvable.
 - Press **Watch Prolog**, then pause, step, change speed, or scrub the timeline.
+- Select a rule name in the execution log to open its literal Prolog clause and source line.
 - Select **Backtracking demo** to see search bindings being undone. The easy
   and hard benchmark fixtures can be solved entirely by propagation.
 - Reset returns to your clues and lets you play again. Player-entered digits
@@ -58,24 +67,27 @@ Use `--port 8001` if port 8000 is already occupied. Stop the server with Ctrl+C.
 The interface replays JSON events recorded from an actual SWI-Prolog run.
 `src/prolog/sudoku_trace.pl` reuses the core normalization, box layout, and
 labeling options, posts the same constraints in the same order, and records
-finite domains after each `all_distinct/1`. During native `labeling([ffc], ...)`,
-[`freeze/2`](https://www.swi-prolog.org/pldoc/man?predicate=freeze%2F2) observers
-record variable bindings; a failing alternative records their undo. The journal
-does not distinguish a labeling choice from a binding forced by propagation,
-and it does not expose every internal CLP(FD) operation. Search-phase candidate
-domains are hidden because only binding changes are recorded during labeling.
-The displayed query describes the solver; the UI executes `trace_puzzle/1`.
+finite domains after each `all_distinct/1`. The journal names the predicate
+used for each stage and unit. During native `labeling([ffc], ...)`, an isolated
+SWI-Prolog debugger hook records calls and redo ports of
+`clpfd:choice_order_variable/7`, including the selected cell and its domain.
+[`freeze/2`](https://www.swi-prolog.org/pldoc/man?predicate=freeze%2F2)
+observers separately record bindings and their undo. A redo event identifies
+the exact choice rule and cell resumed after rollback. Each preceding undo
+in that rollback sequence points to the observed redo destination. Individual bindings
+can still be a choice or a propagation consequence; the journal does not
+claim to expose every internal CLP(FD) operation.
+The choice-rule hook targets SWI-Prolog 10.0.2's CLP(FD) implementation;
+it may need adjustment if that library changes in a later release.
 
 The original solver and benchmark path are unchanged. Trace timings are not
 benchmark timings. A run is limited to 15 seconds and 20,000 events; the local
 server listens only on `127.0.0.1`. Replay begins after recording finishes.
 
-The interface follows the **Industrial** preset from
-[Ilm-Alan/frontend-design](https://github.com/Ilm-Alan/frontend-design): black
-surfaces, IBM Plex Mono, amber signals, and flat square panels. The font files
-are bundled locally under their [SIL Open Font License](src/web/fonts/OFL.txt).
-During playback, use a log entry's **Inspect** button to select its cell and
-highlight the matching row and column coordinates.
+The interface uses a white, Helvetica-style layout with the Sudoku board
+beside the execution log. Source is read from this repository and the installed
+SWI-Prolog `library(clpfd)` file. During playback, use a log entry's **Inspect**
+button to select its cell.
 
 ### Solver and benchmark commands
 

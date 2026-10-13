@@ -259,14 +259,18 @@ The design is complete when both solvers implement the shared behavioral contrac
 accepts integer boards at `POST /api/trace`. Each request runs
 `scripts/trace_prolog.pl` in an isolated SWI-Prolog process. The trace adapter
 uses the existing model helpers and native labeling, with snapshots after
-domain setup and each unit constraint. Frozen goals observe search bindings
-and failing alternatives observe rollback. This instrumentation stays outside
-the benchmark solver and is regression-tested through the Python suite.
+domain setup and each unit constraint. A debugger hook records the native
+`clpfd:choice_order_variable/7` call and redo ports, including the selected
+cell and domain. Frozen goals observe bindings and their undo. This
+instrumentation stays outside the benchmark solver and is regression-tested
+through the Python suite. The hook observes a SWI-Prolog 10.0.2 internal
+predicate and must be reviewed if the CLP(FD) library changes.
 
 The browser records the submitted board, then replays snapshots and binding
 deltas with pause, step, rewind, speed, and timeline controls. A search binding
-may be a decision or a propagated consequence; the UI intentionally labels both
-as bindings. No internal decision classification is claimed. The backtracking
-fixture demonstrates rollback; existing fixtures may finish during propagation.
+may be a decision or a propagated consequence; the UI labels both as bindings
+and shows native choice events separately. Redo events identify the choice
+rule and cell where search resumes. The backtracking fixture demonstrates
+rollback; existing fixtures may finish during propagation.
 Invalid and unsolvable outcomes are separate terminal events. Resource limits
 return explicit errors instead of presenting an incomplete trace as a solution.

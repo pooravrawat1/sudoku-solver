@@ -6,52 +6,75 @@
 :- use_module(library(http/json)).
 :- use_module(sudoku).
 
+:- multifile user:prolog_trace_interception/4.
+
+
+% The debugger hook is active only while trace_labeling/2 runs. System access
+% exposes CLP(FD)'s actual choice rule, including its redo port.
+user:prolog_trace_interception(Port, Frame, _Choice, continue) :-
+    (   (Port == call ; Port = redo(_)),
+        prolog_frame_attribute(Frame, goal, Goal),
+        Goal = clpfd:choice_order_variable(step, up, Var, _, _, ffc, _),
+        nb_current(trace_cells, Cells),
+        nth0(Index, Cells, Cell),
+        Cell == Var
+    ->  sudoku_trace:choice_event(Port, Index, Var)
+    ;   true
+    ).
+
 
 %!  trace_puzzle(+Puzzle) is det.
 %
 %   Writes newline-delimited JSON for one real CLP(FD) execution. Constraint
-%   snapshots expose domains; labeling observers report bindings and their
-%   reversal on backtracking. Observers do not choose values or prune search.
+%   snapshots expose domains. The debugger hook reports native labeling
+%   choices and their redo ports; frozen observers report bindings and undo.
+%   Instrumentation does not choose values or prune search.
 %   Throws trace_limit after 20000 events. Intended for an isolated process.
 
 trace_puzzle(Puzzle) :-
     nb_setval(trace_count, 0),
+    emit(_{type:rule, rule:"sudoku:valid_puzzle/1",
+           message:"Check shape, digit range, and conflicting clues."}),
     (   valid_puzzle(Puzzle)
     ->  (   once(trace_solution(Puzzle, Solution))
-        ->  emit(_{type:solved, board:Solution,
+        ->  emit(_{type:solved, rule:"sudoku:valid_solution/2", board:Solution,
                    message:"Solution verified: all units and original clues are valid."})
-        ;   emit(_{type:unsolvable, board:Puzzle,
-                   message:"No solution satisfies all of these clues."})
+        ;   emit(_{type:unsolvable, rule:"clpfd:labeling/2", board:Puzzle,
+                   message:"labeling([ffc]) exhausted every branch; no solution satisfies the clues."})
         )
-    ;   emit(_{type:invalid,
-               message:"Use nine rows of digits 0–9 with no conflicting clues."})
+    ;   emit(_{type:invalid, rule:"sudoku:valid_puzzle/1",
+               message:"valid_puzzle/1 failed: use nine rows of digits 0–9 with no conflicting clues."})
     ).
 
 
 trace_solution(Puzzle, Board) :-
     % Reuse the core model's normalization, box layout, and search options.
     sudoku:zeros_to_variables(Puzzle, Board),
+    emit(_{type:rule, rule:"sudoku:zeros_to_variables/2",
+           message:"Completed normalization: each zero is a fresh logic variable; clues stay fixed."}),
     append(Board, Cells),
     Cells ins 1..9,
-    snapshot(Board, "domains", "Empty cells become logic variables with domain 1..9."),
+    snapshot(Board, "domains", "clpfd:ins/2",
+             "After Cells ins 1..9, every unknown has a finite domain."),
     post_units(Board, Board, row, 1),
     transpose(Board, Columns),
     post_units(Columns, Board, column, 1),
     sudoku:puzzle_boxes(Board, Boxes),
     post_units(Boxes, Board, box, 1),
-    snapshot(Board, "search", "labeling([ffc], Cells): search any remaining domains."),
+    snapshot(Board, "search", "clpfd:labeling/2",
+             "Next: labeling([ffc], Cells), after all 27 all_distinct/1 rules."),
     observe_cells(Cells, 0),
     sudoku:labeling_options(Options),
-    labeling(Options, Cells),
+    trace_labeling(Options, Cells),
     valid_solution(Puzzle, Board).
 
 
 post_units([], _, _, _).
 post_units([Unit|Units], Board, Kind, Index) :-
-    format(string(Message), 'all_distinct/1 on ~w ~d; propagate remaining domains.',
+    format(string(Message), 'Completed all_distinct/1 on ~w ~d; domains shown after propagation.',
            [Kind, Index]),
     all_distinct(Unit),
-    snapshot(Board, "constraint", Message),
+    snapshot(Board, "constraint", "clpfd:all_distinct/1", Message),
     Next is Index + 1,
     post_units(Units, Board, Kind, Next).
 
@@ -69,16 +92,70 @@ observe_cells([Cell|Cells], Index) :-
 % The failing alternative logs undo when Prolog revisits this binding.
 % It introduces no successful alternative and does not implement search.
 observe_binding(Index, Value) :-
-    emit(_{type:bind, cell:Index, value:Value}),
+    emit(_{type:bind, rule:"clpfd:labeling/2", cell:Index, value:Value}),
     (   true
-    ;   emit(_{type:backtrack, cell:Index, value:0}),
+    ;   emit(_{type:backtrack, rule:"clpfd:labeling/2", cell:Index, value:0}),
         fail
     ).
 
 
-snapshot(Board, Type, Message) :-
+%!  trace_labeling(+Options, +Cells) is nondet.
+%
+%   Runs native labeling with the debugger hook enabled. The isolated trace
+%   process exposes CLP(FD)'s choice_order_variable/7 call and redo ports.
+
+trace_labeling(Options, Cells) :-
+    setup_call_cleanup(
+        start_labeling_trace(Cells),
+        labeling(Options, Cells),
+        stop_labeling_trace
+    ).
+
+
+start_labeling_trace(Cells) :-
+    nb_linkval(trace_cells, Cells),
+    current_prolog_flag(access_level, Access),
+    nb_setval(trace_access_level, Access),
+    set_prolog_flag(access_level, system),
+    visible(-all),
+    visible(+call),
+    visible(+redo),
+    leash(-all),
+    trace.
+
+
+stop_labeling_trace :-
+    notrace,
+    nb_delete(trace_cells),
+    nb_getval(trace_access_level, Access),
+    nb_delete(trace_access_level),
+    set_prolog_flag(access_level, Access).
+
+
+choice_event(Port, Index, Var) :-
+    fd_set(Var, Set),
+    fdset_to_list(Set, Domain),
+    Domain = [First|_],
+    Row is Index // 9 + 1,
+    Column is Index mod 9 + 1,
+    atomics_to_string(Domain, ", ", DomainText),
+    (   Port == call
+    ->  Type = choice,
+        format(string(Message),
+               'ffc selects r~dc~d from {~s}; step/up tries ~d first.',
+               [Row, Column, DomainText, First])
+    ;   Type = retry,
+        format(string(Message),
+               'redo choice at r~dc~d; exclude ~d and propagate the remaining domain.',
+               [Row, Column, First])
+    ),
+    emit(_{type:Type, rule:"clpfd:choice_order_variable/7",
+           cell:Index, domain:Domain, candidate:First, message:Message}).
+
+
+snapshot(Board, Type, Rule, Message) :-
     maplist(row_domains, Board, Domains),
-    emit(_{type:Type, domains:Domains, message:Message}).
+    emit(_{type:Type, rule:Rule, domains:Domains, message:Message}).
 
 
 row_domains(Row, Domains) :-

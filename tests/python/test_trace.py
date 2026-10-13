@@ -7,7 +7,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
-from serve_ui import run_trace, load_puzzle
+from serve_ui import run_trace, load_puzzle, rule_source
 from sudoku import is_solution
 
 
@@ -44,6 +44,40 @@ class TraceTests(unittest.TestCase):
                 undo_count += 1
         self.assertGreater(undo_count, 0)
         self.assertEqual(values, sum(events[-1]["board"], []))
+
+    def test_native_choice_and_redo_events_name_the_resume_rule(self):
+        events = run_trace(self.fixture("search"))["events"]
+        choices = [event for event in events if event["type"] == "choice"]
+        retries = [(index, event) for index, event in enumerate(events)
+                   if event["type"] == "retry"]
+        self.assertTrue(choices)
+        self.assertTrue(retries)
+        for event in choices + [event for _, event in retries]:
+            self.assertEqual(event["rule"], "clpfd:choice_order_variable/7")
+            self.assertEqual(event["candidate"], event["domain"][0])
+            self.assertIn("r" + str(event["cell"] // 9 + 1), event["message"])
+        for index, retry in retries:
+            self.assertEqual(events[index - 1]["type"], "backtrack")
+            self.assertEqual(events[index - 1]["target"],
+                             {"rule": retry["rule"], "cell": retry["cell"],
+                              "excluded": retry["candidate"]})
+
+    def test_log_rules_open_literal_source_clauses(self):
+        events = run_trace(self.fixture("search"))["events"]
+        names = {event.get("target", {}).get("rule", event["rule"]) for event in events}
+        for name in names:
+            with self.subTest(rule=name):
+                source = rule_source(name)
+                self.assertEqual(source["rule"], name)
+                self.assertGreater(source["line"], 0)
+                self.assertIn(":-", source["source"])
+        choice = rule_source("clpfd:choice_order_variable/7")
+        self.assertIn(";   neq_num(Var, Next)", choice["source"])
+        self.assertNotIn("choice_order_variable(enum", choice["source"])
+        self.assertEqual(rule_source("sudoku:valid_puzzle/1")["file"],
+                         "src/prolog/sudoku.pl")
+        with self.assertRaises(ValueError):
+            rule_source("../../etc/passwd")
 
     def test_domains_only_shrink_during_constraint_posting(self):
         snapshots = [e["domains"] for e in run_trace(self.fixture("hard"))["events"]
